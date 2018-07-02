@@ -2,12 +2,12 @@ let
   fetchNixpkgs = import ./fetchNixpkgs.nix;
 in
 
-# version - 18.09
+# version - 18.03
 
 # to update use
-# nix-prefetch-url --unpack https://github.com/NixOS/nixpkgs/archive/a260b3d681164bedaeb90fd578390147799d638c.tar.gz
+# nix-prefetch-url --unpack https://github.com/NixOS/nixpkgs/archive/$rev.tar.gz
 
 fetchNixpkgs {
-  rev    = "a260b3d681164bedaeb90fd578390147799d638c";
-  sha256 = "1mhx4psyp4ar920rf4dvdc47dhcnm2gs5gr90xfknnmcqil08gwn";
+  rev    = "949bddfae38a613a0e8b0931e48ea5d843c1cf71";
+  sha256 = "14lbj6qdgga548k7x610an34c91204dmhcz0c5lc9viry184x0l7";
 }
