@@ -50,9 +50,5 @@ let
 
     })
   ];
-
-  pkgs = import nixpkgs { inherit config overlays; };
-
 in
-
-  { inherit (pkgs.haskellPackages) nixfromnpm; inherit pkgs; }
+  import nixpkgs { inherit config overlays; }
