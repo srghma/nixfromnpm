@@ -6,26 +6,25 @@
 let
   pkgs = (import ./release.nix { inherit nixpkgs compiler; });
 
-  inherit (pkgs.haskellPackages) nixfromnpm;
+  inherit (pkgs) haskellPackages;
 
-  haskellPackages = if compiler == null then pkgs.haskellPackages
-                    else pkgs.haskell.packages."${compiler}";
+  inherit (haskellPackages) nixfromnpm;
 
-  my-intero =
-    (import ((import <nixpkgs> {}).pkgs.fetchFromGitHub {
-      owner = "NixOS"; repo = "nixpkgs";
-      rev = "2c1838ab99b";
-      sha256 = "0lz9gmb97y6cvjj5pbz89cx97c6d49v5nmfwh8sbmgfmqy8cfwxp";
-    }) {}).haskellPackages.intero;
-
-
-  ghc = haskellPackages.ghcWithPackages (ps: with ps; [
-    monad-par mtl my-intero QuickCheck
-  ]);
+  hie = (import ((import nixpkgs {}).fetchFromGitHub {
+    owner = "domenkozar"; repo = "hie-nix";
+    rev = "e3113da93b479bec3046e67c0123860732335dd9";
+    sha256 = "05rkzjvzywsg66iafm84xgjlkf27yfbagrdcb8sc9fd59hrzyiqk";
+  }) {}).hie82;
 in
 
-pkgs.stdenv.mkDerivation {
-  name = "my-haskell-env-0";
-  buildInputs = [ ghc ];
-  shellHook = "eval $(egrep ^export ${ghc}/bin/ghc)";
-}
+pkgs.lib.overrideDerivation nixfromnpm.env (oldAttrs: {
+  buildInputs =
+    oldAttrs.buildInputs ++
+    [ hie ] ++
+    (with haskellPackages; [cabal-install hlint hindent stylish-haskell]);
+
+  # Caution: leave oldAttrs.shellHook in place, or HIE will break (just HIE!).
+  shellHook = oldAttrs.shellHook + ''
+    export NIX_PATH='nixpkgs=${nixpkgs}'
+  '';
+})
